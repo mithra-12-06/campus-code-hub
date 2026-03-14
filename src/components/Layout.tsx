@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { Terminal, LayoutDashboard, Trophy, Code2, Calendar, BarChart3 } from "lucide-react";
+import { Terminal, LayoutDashboard, Trophy, Code2, Calendar, BarChart3, Swords, Users, History, Flame, Timer } from "lucide-react";
+import { useState } from "react";
 
 const navItems = [
   { to: "/", label: "Home", icon: Terminal },
@@ -10,8 +11,35 @@ const navItems = [
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
+const moreItems = [
+  { to: "/contest", label: "Contest", icon: Timer },
+  { to: "/battle", label: "Battle", icon: Swords },
+  { to: "/pair", label: "Pair Code", icon: Users },
+  { to: "/submissions", label: "Submissions", icon: History },
+  { to: "/heatmap", label: "Heatmap", icon: Flame },
+];
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const renderLink = ({ to, label, icon: Icon }: typeof navItems[0]) => {
+    const active = location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
+    return (
+      <Link
+        key={to}
+        to={to}
+        className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+          active
+            ? "bg-primary/10 text-primary"
+            : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+        }`}
+      >
+        <Icon className="h-3.5 w-3.5" />
+        <span className="hidden sm:inline">{label}</span>
+      </Link>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,23 +52,39 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <span className="font-mono text-sm font-bold text-foreground">GFG<span className="text-primary">::</span>Campus</span>
           </Link>
           <div className="flex items-center gap-1">
-            {navItems.map(({ to, label, icon: Icon }) => {
-              const active = location.pathname === to;
-              return (
-                <Link
-                  key={to}
-                  to={to}
-                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                    active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{label}</span>
-                </Link>
-              );
-            })}
+            {navItems.map(renderLink)}
+            {/* More dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setMoreOpen(!moreOpen)}
+                className="flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary"
+              >
+                More ▾
+              </button>
+              {moreOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-50 w-40 rounded-md border border-border bg-card shadow-lg py-1">
+                    {moreItems.map(({ to, label, icon: Icon }) => {
+                      const active = location.pathname === to;
+                      return (
+                        <Link
+                          key={to}
+                          to={to}
+                          onClick={() => setMoreOpen(false)}
+                          className={`flex items-center gap-2 px-3 py-2 text-xs font-medium transition-colors ${
+                            active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                          }`}
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                          {label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </nav>
