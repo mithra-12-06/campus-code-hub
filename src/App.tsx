@@ -11,6 +11,11 @@ import Problems from "@/pages/Problems";
 import ProblemDetail from "@/pages/ProblemDetail";
 import Events from "@/pages/Events";
 import Analytics from "@/pages/Analytics";
+import Contest from "@/pages/Contest";
+import Battle from "@/pages/Battle";
+import PairProgramming from "@/pages/PairProgramming";
+import Submissions from "@/pages/Submissions";
+import Heatmap from "@/pages/Heatmap";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +35,11 @@ const App = () => (
             <Route path="/problems/:id" element={<ProblemDetail />} />
             <Route path="/events" element={<Events />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/contest" element={<Contest />} />
+            <Route path="/battle" element={<Battle />} />
+            <Route path="/pair" element={<PairProgramming />} />
+            <Route path="/submissions" element={<Submissions />} />
+            <Route path="/heatmap" element={<Heatmap />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
