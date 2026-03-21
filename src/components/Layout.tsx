@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { Terminal, LayoutDashboard, Trophy, Code2, Calendar, BarChart3, Swords, Users, History, Flame, Timer } from "lucide-react";
+import { Terminal, LayoutDashboard, Trophy, Code2, Calendar, BarChart3, Swords, Users, History, Flame, Timer, LogIn, LogOut, Shield } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { to: "/", label: "Home", icon: Terminal },
@@ -22,6 +23,7 @@ const moreItems = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
 
   const renderLink = ({ to, label, icon: Icon }: typeof navItems[0]) => {
     const active = location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
@@ -85,6 +87,44 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </>
               )}
             </div>
+          </div>
+
+          {/* Auth section - pushed to the right */}
+          <div className="ml-auto flex items-center gap-1">
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  location.pathname === "/admin"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                }`}
+              >
+                <Shield className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Admin</span>
+              </Link>
+            )}
+            {user ? (
+              <button
+                onClick={signOut}
+                className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  location.pathname === "/auth"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                }`}
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Sign In</span>
+              </Link>
+            )}
           </div>
         </div>
       </nav>

@@ -41,14 +41,12 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"events" | "registrations">("events");
 
-  // New event form
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [newDate, setNewDate] = useState("");
   const [newType, setNewType] = useState("Workshop");
 
-  // Registrations view
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [regLoading, setRegLoading] = useState(false);
@@ -65,14 +63,14 @@ export default function Admin() {
   }, [isAdmin]);
 
   const fetchEvents = async () => {
-    const { data } = await supabase.from("events").select("*").order("date", { ascending: true });
+    const { data } = await (supabase as any).from("events").select("*").order("date", { ascending: true });
     setEvents((data as EventRow[]) || []);
     setLoading(false);
   };
 
   const createEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("events").insert({
+    const { error } = await (supabase as any).from("events").insert({
       title: newTitle,
       description: newDesc,
       date: newDate,
@@ -90,7 +88,7 @@ export default function Admin() {
 
   const deleteEvent = async (id: number) => {
     if (!confirm("Delete this event? All registrations will be removed.")) return;
-    await supabase.from("events").delete().eq("id", id);
+    await (supabase as any).from("events").delete().eq("id", id);
     toast({ title: "Event deleted" });
     fetchEvents();
   };
@@ -99,7 +97,7 @@ export default function Admin() {
     setSelectedEventId(eventId);
     setActiveTab("registrations");
     setRegLoading(true);
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from("event_registrations")
       .select("*")
       .eq("event_id", eventId)
@@ -128,7 +126,6 @@ export default function Admin() {
           <h1 className="font-mono text-xs text-muted-foreground uppercase tracking-wider">// Admin Panel</h1>
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setActiveTab("events")}

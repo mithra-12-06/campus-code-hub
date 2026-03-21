@@ -49,7 +49,7 @@ export default function EventRegister() {
   }, [id, user]);
 
   const fetchEvent = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("events")
       .select("*")
       .eq("id", Number(id))
@@ -59,13 +59,13 @@ export default function EventRegister() {
       navigate("/events");
       return;
     }
-    setEvent(data);
+    setEvent(data as EventData);
     setLoading(false);
   };
 
   const checkExistingRegistration = async () => {
     if (!user) return;
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from("event_registrations")
       .select("id")
       .eq("event_id", Number(id))
@@ -76,7 +76,7 @@ export default function EventRegister() {
 
   const loadProfile = async () => {
     if (!user) return;
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from("profiles")
       .select("*")
       .eq("id", user.id)
@@ -97,7 +97,7 @@ export default function EventRegister() {
     setSubmitting(true);
 
     try {
-      const { error } = await supabase.from("event_registrations").insert({
+      const { error } = await (supabase as any).from("event_registrations").insert({
         event_id: event.id,
         user_id: user.id,
         full_name: fullName,
@@ -111,8 +111,8 @@ export default function EventRegister() {
 
       if (error) throw error;
 
-      // Also update profile with latest info
-      await supabase.from("profiles").update({
+      // Also update profile
+      await (supabase as any).from("profiles").update({
         full_name: fullName,
         department,
         section,
@@ -153,7 +153,7 @@ export default function EventRegister() {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Event Details - Left */}
+          {/* Event Details */}
           <div className="lg:col-span-2">
             <div className="rounded-lg border border-border bg-card p-5 sticky top-20">
               <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
@@ -175,7 +175,7 @@ export default function EventRegister() {
             </div>
           </div>
 
-          {/* Registration Form - Right */}
+          {/* Registration Form */}
           <div className="lg:col-span-3">
             {registered ? (
               <div className="rounded-lg border border-primary/30 bg-primary/5 p-8 text-center">
@@ -197,20 +197,12 @@ export default function EventRegister() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label className="text-xs text-muted-foreground">Full Name *</Label>
-                      <Input
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Rahul Sharma"
-                        required
-                        className="mt-1 bg-background border-border"
-                      />
+                      <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Rahul Sharma" required className="mt-1 bg-background border-border" />
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Department *</Label>
                       <Select value={department} onValueChange={setDepartment} required>
-                        <SelectTrigger className="mt-1 bg-background border-border">
-                          <SelectValue placeholder="Select department" />
-                        </SelectTrigger>
+                        <SelectTrigger className="mt-1 bg-background border-border"><SelectValue placeholder="Select department" /></SelectTrigger>
                         <SelectContent>
                           {["CSE", "IT", "ECE", "EEE", "MECH", "CIVIL", "AI&DS", "CSBS", "Other"].map((d) => (
                             <SelectItem key={d} value={d}>{d}</SelectItem>
@@ -224,9 +216,7 @@ export default function EventRegister() {
                     <div>
                       <Label className="text-xs text-muted-foreground">Section *</Label>
                       <Select value={section} onValueChange={setSection} required>
-                        <SelectTrigger className="mt-1 bg-background border-border">
-                          <SelectValue placeholder="Select section" />
-                        </SelectTrigger>
+                        <SelectTrigger className="mt-1 bg-background border-border"><SelectValue placeholder="Select section" /></SelectTrigger>
                         <SelectContent>
                           {["A", "B", "C", "D", "E", "F"].map((s) => (
                             <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -237,9 +227,7 @@ export default function EventRegister() {
                     <div>
                       <Label className="text-xs text-muted-foreground">Year *</Label>
                       <Select value={year} onValueChange={setYear} required>
-                        <SelectTrigger className="mt-1 bg-background border-border">
-                          <SelectValue placeholder="Select year" />
-                        </SelectTrigger>
+                        <SelectTrigger className="mt-1 bg-background border-border"><SelectValue placeholder="Select year" /></SelectTrigger>
                         <SelectContent>
                           {["1st Year", "2nd Year", "3rd Year", "4th Year"].map((y) => (
                             <SelectItem key={y} value={y}>{y}</SelectItem>
@@ -252,35 +240,17 @@ export default function EventRegister() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label className="text-xs text-muted-foreground">College *</Label>
-                      <Input
-                        value={college}
-                        onChange={(e) => setCollege(e.target.value)}
-                        placeholder="Your college name"
-                        required
-                        className="mt-1 bg-background border-border"
-                      />
+                      <Input value={college} onChange={(e) => setCollege(e.target.value)} placeholder="Your college name" required className="mt-1 bg-background border-border" />
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Phone Number *</Label>
-                      <Input
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+91 9876543210"
-                        required
-                        className="mt-1 bg-background border-border"
-                      />
+                      <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 9876543210" required className="mt-1 bg-background border-border" />
                     </div>
                   </div>
 
                   <div>
                     <Label className="text-xs text-muted-foreground">Additional Information</Label>
-                    <Textarea
-                      value={additionalInfo}
-                      onChange={(e) => setAdditionalInfo(e.target.value)}
-                      placeholder="Any relevant experience, dietary preferences, team name, etc."
-                      className="mt-1 bg-background border-border"
-                      rows={3}
-                    />
+                    <Textarea value={additionalInfo} onChange={(e) => setAdditionalInfo(e.target.value)} placeholder="Any relevant experience, dietary preferences, team name, etc." className="mt-1 bg-background border-border" rows={3} />
                   </div>
 
                   <Button type="submit" disabled={submitting || !department || !section || !year} className="w-full">
