@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { events } from "@/data/events";
+import { supabase } from "@/integrations/supabase/client";
+import { events as fallbackEvents } from "@/data/events";
 import { Clock } from "lucide-react";
+
+interface EventItem {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  type: string;
+}
 
 function Countdown({ targetDate }: { targetDate: string }) {
   const [timeLeft, setTimeLeft] = useState("");
@@ -24,13 +34,40 @@ function Countdown({ targetDate }: { targetDate: string }) {
 }
 
 export default function Events() {
+  const [eventList, setEventList] = useState<EventItem[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from("events")
+          .select("*")
+          .order("date", { ascending: true });
+        if (error || !data || data.length === 0) {
+          // Fallback to local data
+          setEventList(fallbackEvents.map(e => ({ ...e, description: e.description })));
+        } else {
+          setEventList(data as EventItem[]);
+        }
+      } catch {
+        setEventList(fallbackEvents.map(e => ({ ...e, description: e.description })));
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  const handleRegister = (eventId: number) => {
+    navigate(`/events/${eventId}/register`);
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-mono text-xs text-muted-foreground uppercase tracking-wider mb-6">// Events</h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {events.map((ev, i) => (
+          {eventList.map((ev, i) => (
             <motion.div
               key={ev.id}
               initial={{ opacity: 0, y: 10 }}
@@ -51,12 +88,12 @@ export default function Events() {
                 <span className="text-xs text-muted-foreground">
                   {new Date(ev.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                 </span>
-                <a
-                  href={ev.registrationLink}
+                <button
+                  onClick={() => handleRegister(ev.id)}
                   className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:brightness-110 transition-all"
                 >
                   Register →
-                </a>
+                </button>
               </div>
             </motion.div>
           ))}
